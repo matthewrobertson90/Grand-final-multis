@@ -68,6 +68,10 @@ while True:
         if key != last_key and now - last_emit >= MIN_GAP:
             s["updatedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
             json.dump(s, open(OUT, "w"))
+            if os.environ.get("GIT_PUSH"):
+                os.makedirs("live", exist_ok=True)
+                json.dump(s, open("live/gf.json", "w"))
+                os.system("git add live/gf.json >/dev/null && git commit -qm 'Live update: %s Q%s' -m 'Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>' -m 'Claude-Session: https://claude.ai/code/session_01HBaQKpGcWcRebHmAcNETxX' >/dev/null 2>&1; git push -q origin HEAD >/dev/null 2>&1 || (sleep 3; git push -q origin HEAD >/dev/null 2>&1)" % (s["status"], s["period"]))
             last_key, last_emit = key, now
             print(f"UPDATE {s['status']} Q{s['period']} {s['periodSeconds']//60}m "
                   f"BRI {s['bri']['g']}.{s['bri']['b']} FRE {s['fre']['g']}.{s['fre']['b']}", flush=True)
