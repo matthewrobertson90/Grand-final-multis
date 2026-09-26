@@ -115,6 +115,42 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
 .s-sw .stripe{background:var(--warn)} .s-sw .chip{color:var(--warn)}
 .s-lo .stripe{background:var(--bad)} .s-lo .chip{color:var(--bad)}
 
+/* Glance view */
+.viewbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:2px}
+.seg button{background:none;border:0;border-radius:7px;padding:5px 12px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--gold);color:#1a1204}
+.bstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;border-top:3px solid var(--c)}
+.bt.dead{opacity:.5}
+.bt .n{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt .p{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05;color:var(--c)}
+.bt .r{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pips{display:flex;gap:3px;margin-top:5px}
+.pips i{flex:1;height:5px;border-radius:2px;background:var(--faint)}
+.board2{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.lr{display:grid;grid-template-columns:4px minmax(0,1fr) auto 66px;align-items:center;gap:0 10px;padding:7px 12px 7px 0;border-top:1px solid #1b2742}
+.lr:first-child{border-top:0}
+.lr .stripe{align-self:stretch;border-radius:0 3px 3px 0;background:var(--faint)}
+.lr .nm{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .nm small{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:4px}
+.lr .mb{height:4px;background:var(--panel2);border-radius:2px;position:relative;margin-top:5px;overflow:hidden}
+.lr .mb i{position:absolute;inset:0 auto 0 0;border-radius:2px}
+.lr .ct{font-family:var(--display);font-weight:700;font-size:20px;text-align:right;line-height:1}
+.lr .ct small{font-size:13px;color:var(--muted);font-weight:500}
+.lr .pc{font-family:var(--display);font-weight:700;font-size:18px;text-align:right;line-height:1}
+.lr .dots{display:flex;gap:4px;margin-top:4px;align-items:center}
+.lr .dots b{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.lr .dots span{font-size:10.5px;color:var(--faint);margin-left:2px}
+.lr .ch{white-space:nowrap;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:right;margin-top:3px}
+.lr.s-won .stripe,.lr.s-hi .stripe{background:var(--good)} .lr.s-won .ch,.lr.s-hi .ch,.lr.s-won .pc{color:var(--good)}
+.lr.s-lost .stripe,.lr.s-lo .stripe{background:var(--bad)} .lr.s-lost .ch,.lr.s-lo .ch,.lr.s-lost .pc{color:var(--bad)}
+.lr.s-mid .stripe{background:var(--info)} .lr.s-mid .ch{color:var(--info)}
+.lr.s-sw .stripe{background:var(--warn)} .lr.s-sw .ch{color:var(--warn)}
+.lr.s-lost{opacity:.6}
+.glegend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:8px 12px;border-top:1px solid #1b2742}
+.glegend b{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:var(--c)}
+
 /* Cheer list */
 .cheer{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px}
 .cheer .row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #1b2742;font-size:14px}
@@ -200,6 +236,7 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
         <h2>Your afternoon</h2>
         <div class="tiles" id="tiles"></div>
       </div>
+      <div class="viewbar"><h2 style="margin:0">Your multis</h2><div class="seg" role="group" aria-label="View"><button data-v="glance" id="vGlance">Glance</button><button data-v="detail" id="vDetail">Detail</button></div></div>
       <div id="bets" class="sect"></div>
       <div>
         <h2>Cheer list</h2>
@@ -403,6 +440,36 @@ function band(p, st) { if (st === 'won') return ['s-won', 'Landed']; if (st === 
 
 // ---------- Rendering ----------
 let last = null, pre = null, preKey = '';
+let VIEW = 'glance';
+try { VIEW = localStorage.getItem(STORE + '-view') || 'glance'; } catch (e) {}
+function glanceHtml(c, sim) {
+  const strip = BETS.map((b, bi) => {
+    const sts = b.legs.map(l => legStatus(l, c)), dead = sts.includes('lost'), done = sts.every(s => s === 'won');
+    const pNow = sim.bet[bi];
+    const pips = b.legs.map(l => { const st = legStatus(l, c), p = legProb(l, c), [cls] = band(p, st); const col = {'s-won':'var(--good)','s-hi':'var(--good)','s-mid':'var(--info)','s-sw':'var(--warn)','s-lo':'var(--bad)','s-lost':'var(--bad)'}[cls]; return `<i style="background:${col};opacity:${st === 'live' ? .75 : 1}"></i>`; }).join('');
+    return `<div class="bt ${dead ? 'dead' : ''}" style="--c:${dead ? 'var(--bad)' : done ? 'var(--good)' : b.color}"><div class="n">${esc(b.short)} · ${money(b.ret)}</div><div class="p num">${dead ? 'Dead' : done ? 'Won' : pct(pNow)}</div><div class="r num">${dead ? 'Leg down' : 'Fair ' + money(pNow*b.ret)}</div><div class="pips">${pips}</div></div>`;
+  }).join('');
+  const rows = UNIQUE.map(l => {
+    const st = legStatus(l, c), p = legProb(l, c), [cls, chip] = band(p, st);
+    const inBets = BETS.filter(b => b.legs.some(x => x.key === l.key));
+    const dots = inBets.map(b => `<b style="--c:${b.color}" title="${esc(b.short)}"></b>`).join('') + `<span>${inBets.map(b => b.short).join(' · ')}</span>`;
+    let name, ct, fill, col;
+    if (l.win) {
+      name = `Lions win<small>${c.margin === 0 ? 'level' : (c.margin > 0 ? '+' : '') + c.margin}</small>`;
+      ct = `<span class="num">${c.margin > 0 ? '+' : ''}${c.margin}</span>`; fill = p*100; col = 'var(--lions)';
+    } else {
+      const pl = P[l.p], q = c.pp[l.p], u = pl.stat === 'disp' ? '' : 'g';
+      const line = l.op === 'ge' ? `${l.n}+${pl.stat === 'disp' ? '' : ' goals'}` : `under ${l.n + 0.5}`;
+      name = `${esc(pl.name.split(' ').slice(-1)[0])}<small>${line}</small>`;
+      ct = `${q.x}<small>/${l.op === 'ge' ? l.n : '≤' + l.n}</small>`;
+      fill = Math.min(100, q.x/(l.op === 'ge' ? l.n : l.n + 1)*100);
+      col = l.op === 'le' ? (q.x > l.n ? 'var(--bad)' : 'var(--freo)') : (q.x >= l.n ? 'var(--good)' : 'var(--gold)');
+    }
+    return `<div class="lr ${cls}"><span class="stripe"></span><div style="min-width:0"><div class="nm">${name}</div><div class="mb"><i style="width:${fill}%;background:${col}"></i></div><div class="dots">${dots}</div></div><div class="ct num">${ct}</div><div><div class="pc num">${st === 'won' ? '✓' : st === 'lost' ? '✗' : pct(p)}</div><div class="ch">${chip}</div></div></div>`;
+  });
+  const order = UNIQUE.map((l, i) => ({i, st: legStatus(l, c), p: legProb(l, c)})).sort((a, b) => { const r = s => s === 'live' ? 0 : s === 'won' ? 1 : 2; return r(a.st) - r(b.st) || a.p - b.p; });
+  return `<div class="bstrip">${strip}</div><div class="board2">${order.map(o => rows[o.i]).join('')}<div class="glegend">${BETS.map(b => `<span><b style="--c:${b.color}"></b>${esc(b.short)}</span>`).join('')}<span>Riskiest live legs first</span></div></div>`;
+}
 function compute() {
   const f = frac();
   const c = ctx({f, margin: margin(), pl: S.pl});
@@ -482,7 +549,9 @@ function render() {
   ].map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${s}</div></div>`).join('');
 
   // bet cards
-  $('bets').innerHTML = BETS.map((b, bi) => {
+  $('vGlance').classList.toggle('on', VIEW === 'glance'); $('vDetail').classList.toggle('on', VIEW === 'detail');
+  if (VIEW === 'glance') $('bets').innerHTML = glanceHtml(c, sim);
+  else $('bets').innerHTML = BETS.map((b, bi) => {
     const pNow = sim.bet[bi], p0 = pre.sim.bet[bi];
     const sts = b.legs.map(l => legStatus(l, c));
     const won = sts.filter(s => s === 'won').length, lost = sts.filter(s => s === 'lost').length, live = sts.length - won - lost;
@@ -618,6 +687,7 @@ function buildForm() {
 // ---------- Events ----------
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.v) { VIEW = t.dataset.v; try { localStorage.setItem(STORE + '-view', VIEW); } catch (e2) {} render(); return; }
   if (t.dataset.t) { document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b === t)); document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.dataset.p === t.dataset.t)); try { localStorage.setItem(STORE + '-tab', t.dataset.t); } catch (e2) {} window.scrollTo({top:0}); return; }
   if (t.dataset.sc) { const [tm, k, d] = t.dataset.sc.split(','); snapshot(); S.score[tm][k] = Math.max(0, S.score[tm][k] + +d); changed(); return; }
   if (t.dataset.d) { const [id, d] = t.dataset.d.split(','); snapshot(); const before = S.pl[id].x; S.pl[id].x = Math.max(0, before + +d); if (S.set.autoScore && P[id].stat === 'goals' && S.pl[id].x !== before) { const tm = P[id].team === 'BRI' ? 'bri' : 'fre'; S.score[tm].g = Math.max(0, S.score[tm].g + +d); } changed(); return; }
