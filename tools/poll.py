@@ -75,7 +75,7 @@ while True:
             last_key, last_emit = key, now
             print(f"UPDATE {s['status']} Q{s['period']} {s['periodSeconds']//60}m "
                   f"BRI {s['bri']['g']}.{s['bri']['b']} FRE {s['fre']['g']}.{s['fre']['b']}", flush=True)
-            if s["status"] == "CONCLUDED":
+            if s["status"] in ("CONCLUDED", "POSTGAME"):
                 print("FINAL", flush=True)
                 break
     except Exception as e:  # keep polling through transient failures

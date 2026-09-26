@@ -815,7 +815,7 @@ function applyLive(d) {
   const started = d.status !== 'CONFIRMED_TEAMS' && d.status !== 'SCHEDULED' && d.status !== 'UNCONFIRMED_TEAMS';
   S.score.bri = {g: d.bri.g, b: d.bri.b}; S.score.fre = {g: d.fre.g, b: d.fre.b};
   PLAYERS.forEach(p => { const x = d.players && d.players[p.id]; if (x) S.pl[p.id].x = p.stat === 'disp' ? x.d : x.g; });
-  if (d.status === 'CONCLUDED' || d.status === 'POST_GAME') { S.final = true; S.running = false; }
+  if (d.status === 'CONCLUDED' || d.status === 'POST_GAME' || d.status === 'POSTGAME') { S.final = true; S.running = false; }
   else if (started) {
     S.final = false; S.q = Math.min(4, Math.max(1, d.period));
     if (d.periodCompleted) { S.running = false; S.base = S.set.qlen; }
