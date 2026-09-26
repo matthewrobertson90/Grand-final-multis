@@ -1,0 +1,626 @@
+{
+"mccluggage": {
+"m": 18.9,
+"k": 2,
+"season": 17.88,
+"sd": 5.91,
+"l5": 20.4,
+"n": 16,
+"last": [
+[
+"Round 19",
+"West Coast Eagles",
+13,
+0
+],
+[
+"Round 20",
+"Port Adelaide",
+29,
+1
+],
+[
+"Round 21",
+"Carlton",
+18,
+1
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+16,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+16,
+2
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+23,
+3
+]
+],
+"vs": [
+[
+"Round 12",
+13,
+0
+]
+]
+},
+"neale": {
+"m": 26.8,
+"k": 2,
+"season": 29.04,
+"sd": 6.46,
+"l5": 23.4,
+"n": 26,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+35,
+0
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+17,
+0
+],
+[
+"Round 24",
+"Collingwood",
+35,
+0
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+18,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+21,
+0
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+26,
+0
+]
+],
+"vs": [
+[
+"Round 12",
+23,
+0
+]
+]
+},
+"zorko": {
+"m": 24.5,
+"k": 2,
+"season": 24.81,
+"sd": 6.49,
+"l5": 24.0,
+"n": 16,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+25,
+0
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+25,
+1
+],
+[
+"Round 24",
+"Collingwood",
+21,
+0
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+26,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+27,
+1
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+21,
+0
+]
+],
+"vs": []
+},
+"ashcroft": {
+"m": 27.9,
+"k": 9.3,
+"season": 28.46,
+"sd": 5.56,
+"l5": 27.0,
+"n": 26,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+39,
+0
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+31,
+1
+],
+[
+"Round 24",
+"Collingwood",
+25,
+1
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+21,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+30,
+0
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+28,
+1
+]
+],
+"vs": [
+[
+"Round 12",
+22,
+2
+]
+]
+},
+"bailey": {
+"m": 22.0,
+"k": 30,
+"season": 21.6,
+"sd": 4.23,
+"l5": 22.6,
+"n": 25,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+21,
+0
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+27,
+0
+],
+[
+"Round 24",
+"Collingwood",
+24,
+1
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+21,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+23,
+3
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+18,
+0
+]
+],
+"vs": [
+[
+"Round 12",
+30,
+1
+]
+]
+},
+"andrews": {
+"m": 12.5,
+"k": 2,
+"season": 14.04,
+"sd": 4.46,
+"l5": 10.2,
+"n": 23,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+14,
+0
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+10,
+0
+],
+[
+"Round 24",
+"Collingwood",
+7,
+0
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+11,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+12,
+0
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+11,
+0
+]
+],
+"vs": [
+[
+"Round 12",
+10,
+0
+]
+]
+},
+"cameron": {
+"m": 2.3,
+"k": 30,
+"season": 2.23,
+"sd": 1.09,
+"l5": 2.4,
+"n": 26,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+15,
+3
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+17,
+2
+],
+[
+"Round 24",
+"Collingwood",
+11,
+2
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+4,
+0
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+14,
+5
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+13,
+3
+]
+],
+"vs": [
+[
+"Round 12",
+10,
+2
+]
+]
+},
+"hipwood": {
+"m": 1.8,
+"k": 30,
+"season": 1.54,
+"sd": 0.93,
+"l5": 2.2,
+"n": 13,
+"last": [
+[
+"Round 22",
+"Hawthorn",
+9,
+2
+],
+[
+"Round 23",
+"Gold Coast SUNS",
+10,
+1
+],
+[
+"Round 24",
+"Collingwood",
+15,
+3
+],
+[
+"Qualifying & Elimination Finals",
+"Sydney Swans",
+11,
+2
+],
+[
+"Semi Finals",
+"Adelaide Crows",
+12,
+2
+],
+[
+"Preliminary Finals",
+"Hawthorn",
+11,
+3
+]
+],
+"vs": []
+},
+"brayshaw": {
+"m": 25.5,
+"k": 7.9,
+"season": 25.0,
+"sd": 5.36,
+"l5": 26.2,
+"n": 26,
+"last": [
+[
+"Round 22",
+"Melbourne",
+20,
+0
+],
+[
+"Round 23",
+"Adelaide Crows",
+27,
+1
+],
+[
+"Round 24",
+"Carlton",
+21,
+1
+],
+[
+"Qualifying & Elimination Finals",
+"Hawthorn",
+30,
+1
+],
+[
+"Semi Finals",
+"Geelong Cats",
+24,
+0
+],
+[
+"Preliminary Finals",
+"Sydney Swans",
+29,
+0
+]
+],
+"vs": [
+[
+"Round 12",
+24,
+0
+]
+]
+},
+"bolton": {
+"m": 22.5,
+"k": 4.0,
+"season": 22.68,
+"sd": 5.31,
+"l5": 22.2,
+"n": 25,
+"last": [
+[
+"Round 22",
+"Melbourne",
+17,
+1
+],
+[
+"Round 23",
+"Adelaide Crows",
+27,
+1
+],
+[
+"Round 24",
+"Carlton",
+17,
+1
+],
+[
+"Qualifying & Elimination Finals",
+"Hawthorn",
+21,
+0
+],
+[
+"Semi Finals",
+"Geelong Cats",
+26,
+2
+],
+[
+"Preliminary Finals",
+"Sydney Swans",
+20,
+2
+]
+],
+"vs": [
+[
+"Round 12",
+21,
+0
+]
+]
+},
+"clark": {
+"m": 23.9,
+"k": 30,
+"season": 22.73,
+"sd": 4.27,
+"l5": 25.6,
+"n": 26,
+"last": [
+[
+"Round 22",
+"Melbourne",
+21,
+0
+],
+[
+"Round 23",
+"Adelaide Crows",
+25,
+0
+],
+[
+"Round 24",
+"Carlton",
+21,
+0
+],
+[
+"Qualifying & Elimination Finals",
+"Hawthorn",
+38,
+0
+],
+[
+"Semi Finals",
+"Geelong Cats",
+25,
+0
+],
+[
+"Preliminary Finals",
+"Sydney Swans",
+19,
+0
+]
+],
+"vs": [
+[
+"Round 12",
+24,
+0
+]
+]
+},
+"voss": {
+"m": 1.66,
+"k": 3.5,
+"season": 1.84,
+"sd": 1.46,
+"l5": 1.4,
+"n": 25,
+"last": [
+[
+"Round 22",
+"Melbourne",
+10,
+4
+],
+[
+"Round 23",
+"Adelaide Crows",
+7,
+0
+],
+[
+"Round 24",
+"Carlton",
+6,
+2
+],
+[
+"Qualifying & Elimination Finals",
+"Hawthorn",
+11,
+0
+],
+[
+"Semi Finals",
+"Geelong Cats",
+12,
+4
+],
+[
+"Preliminary Finals",
+"Sydney Swans",
+10,
+1
+]
+],
+"vs": [
+[
+"Round 12",
+13,
+4
+]
+]
+}
+}

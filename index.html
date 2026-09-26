@@ -133,6 +133,11 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
 .prow.out .pn{text-decoration:line-through;color:var(--muted)}
 .pn{font-weight:600}
 .pmeta{font-size:12px;color:var(--muted)}
+.form-g{color:var(--faint);margin-top:2px}
+.feed{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint);display:inline-block}
+.dot.on{background:var(--good);box-shadow:0 0 0 3px rgba(52,211,153,.2)}
+.dot.stale{background:var(--warn)}
 .pctl{display:flex;align-items:center;gap:6px}
 .pctl .cnt{width:56px;text-align:center;font-family:var(--display);font-weight:700;font-size:24px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 0}
 .pctl .pm{width:44px;height:44px;border-radius:10px;font-size:22px;font-weight:700;background:var(--panel2);border:1px solid var(--line);line-height:1}
@@ -180,6 +185,7 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
     </div>
     <div class="prog" aria-hidden="true"><i id="progFill" style="width:0%"></i><u style="left:25%"></u><u style="left:50%"></u><u style="left:75%"></u></div>
     <div class="wp"><span>Lions win <b class="num" id="wpBri">50%</b></span><div class="wpbar"><i id="wpFill" style="width:50%"></i></div><span><b class="num" id="wpFre">50%</b> Freo</span></div>
+    <div class="feed"><span class="dot" id="feedDot"></span><span id="feedTxt">Live feed: connecting…</span><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="liveOn"> Use live stats</label></div>
     <nav class="tabs" id="tabs">
       <button data-t="multis" class="on">Multis</button>
       <button data-t="track">Tracker</button>
@@ -234,7 +240,7 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
           <p><b>How it works.</b> Each player's pre-game average is a prior. As the game goes on, the model blends that prior with how the player is actually going (a gamma–Poisson update), then works out the chance of getting over or staying under the line in the time left. The quarter clock drives how much time is left, so keep it roughly in sync with the broadcast.</p>
           <p><b>Why multi chances aren't just multiplied.</b> Same-game legs move together. If Brisbane dominate, their players rack up the ball, Fremantle's don't, and the Lions win. 20,000 simulated finishes share one "who's on top" factor, so the multi numbers respect that. Duplicate legs (McCluggage 20+ and 23+) are handled properly too.</p>
           <p><b>Fair value</b> is chance × return, roughly what a fair cash out would be. Bookmaker cash outs usually pay less. <b>Cheer list</b> ranks what would add most to your expected return if it happened now.</p>
-          <p>Pre-game averages are estimates set from the bet lines. Adjust them above if you have better numbers.</p>
+          <p><b>Where the numbers come from.</b> Each player's expected count blends his 2026 season average (60%) with his last five games (40%), from the official AFL match stats for all 51 Brisbane and Fremantle games this year. How much in-game pace moves the estimate comes from each player's own game-to-game spread. The Lions' win chance starts from Squiggle's betting-market model. The live feed pulls scores, the quarter clock, disposals, goals and time on ground from the AFL's match centre about once a minute.</p>
         </div>
         <div class="card" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button class="btn danger" id="resetBtn">Reset game</button>
@@ -252,19 +258,20 @@ h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12e
 "use strict";
 // ---------- Data ----------
 const PLAYERS = [
-  {id:'mccluggage', name:'Hugh McCluggage', team:'BRI', stat:'disp', m:24},
-  {id:'neale',      name:'Lachie Neale',    team:'BRI', stat:'disp', m:27},
-  {id:'zorko',      name:'Dayne Zorko',     team:'BRI', stat:'disp', m:24},
-  {id:'ashcroft',   name:'Will Ashcroft',   team:'BRI', stat:'disp', m:28.5},
-  {id:'bailey',     name:'Zac Bailey',      team:'BRI', stat:'disp', m:21.5},
-  {id:'andrews',    name:'Harris Andrews',  team:'BRI', stat:'disp', m:15},
-  {id:'cameron',    name:'Charlie Cameron', team:'BRI', stat:'goals', m:1.9},
-  {id:'hipwood',    name:'Eric Hipwood',    team:'BRI', stat:'goals', m:1.7},
-  {id:'brayshaw',   name:'Andrew Brayshaw', team:'FRE', stat:'disp', m:25},
-  {id:'bolton',     name:'Shai Bolton',     team:'FRE', stat:'disp', m:20.5},
-  {id:'clark',      name:'Jordan Clark',    team:'FRE', stat:'disp', m:19},
-  {id:'voss',       name:'Patrick Voss',    team:'FRE', stat:'goals', m:2.1},
+  {id:'mccluggage', name:'Hugh McCluggage', team:'BRI', stat:'disp', m:18.9},
+  {id:'neale',      name:'Lachie Neale',    team:'BRI', stat:'disp', m:26.8},
+  {id:'zorko',      name:'Dayne Zorko',     team:'BRI', stat:'disp', m:24.5},
+  {id:'ashcroft',   name:'Will Ashcroft',   team:'BRI', stat:'disp', m:27.9},
+  {id:'bailey',     name:'Zac Bailey',      team:'BRI', stat:'disp', m:22.0},
+  {id:'andrews',    name:'Harris Andrews',  team:'BRI', stat:'disp', m:12.5},
+  {id:'cameron',    name:'Charlie Cameron', team:'BRI', stat:'goals', m:2.3},
+  {id:'hipwood',    name:'Eric Hipwood',    team:'BRI', stat:'goals', m:1.8},
+  {id:'brayshaw',   name:'Andrew Brayshaw', team:'FRE', stat:'disp', m:25.5},
+  {id:'bolton',     name:'Shai Bolton',     team:'FRE', stat:'disp', m:22.5},
+  {id:'clark',      name:'Jordan Clark',    team:'FRE', stat:'disp', m:23.9},
+  {id:'voss',       name:'Patrick Voss',    team:'FRE', stat:'goals', m:1.66},
 ];
+const RESEARCH = {"mccluggage": {"m": 18.9, "k": 2, "season": 17.88, "sd": 5.91, "l5": 20.4, "n": 16, "last": [["Round 19", "West Coast Eagles", 13, 0], ["Round 20", "Port Adelaide", 29, 1], ["Round 21", "Carlton", 18, 1], ["Qualifying & Elimination Finals", "Sydney Swans", 16, 0], ["Semi Finals", "Adelaide Crows", 16, 2], ["Preliminary Finals", "Hawthorn", 23, 3]], "vs": [["Round 12", 13, 0]]}, "neale": {"m": 26.8, "k": 2, "season": 29.04, "sd": 6.46, "l5": 23.4, "n": 26, "last": [["Round 22", "Hawthorn", 35, 0], ["Round 23", "Gold Coast SUNS", 17, 0], ["Round 24", "Collingwood", 35, 0], ["Qualifying & Elimination Finals", "Sydney Swans", 18, 0], ["Semi Finals", "Adelaide Crows", 21, 0], ["Preliminary Finals", "Hawthorn", 26, 0]], "vs": [["Round 12", 23, 0]]}, "zorko": {"m": 24.5, "k": 2, "season": 24.81, "sd": 6.49, "l5": 24.0, "n": 16, "last": [["Round 22", "Hawthorn", 25, 0], ["Round 23", "Gold Coast SUNS", 25, 1], ["Round 24", "Collingwood", 21, 0], ["Qualifying & Elimination Finals", "Sydney Swans", 26, 0], ["Semi Finals", "Adelaide Crows", 27, 1], ["Preliminary Finals", "Hawthorn", 21, 0]], "vs": []}, "ashcroft": {"m": 27.9, "k": 8, "season": 28.46, "sd": 5.56, "l5": 27.0, "n": 26, "last": [["Round 22", "Hawthorn", 39, 0], ["Round 23", "Gold Coast SUNS", 31, 1], ["Round 24", "Collingwood", 25, 1], ["Qualifying & Elimination Finals", "Sydney Swans", 21, 0], ["Semi Finals", "Adelaide Crows", 30, 0], ["Preliminary Finals", "Hawthorn", 28, 1]], "vs": [["Round 12", 22, 2]]}, "bailey": {"m": 22.0, "k": 8, "season": 21.6, "sd": 4.23, "l5": 22.6, "n": 25, "last": [["Round 22", "Hawthorn", 21, 0], ["Round 23", "Gold Coast SUNS", 27, 0], ["Round 24", "Collingwood", 24, 1], ["Qualifying & Elimination Finals", "Sydney Swans", 21, 0], ["Semi Finals", "Adelaide Crows", 23, 3], ["Preliminary Finals", "Hawthorn", 18, 0]], "vs": [["Round 12", 30, 1]]}, "andrews": {"m": 12.5, "k": 2, "season": 14.04, "sd": 4.46, "l5": 10.2, "n": 23, "last": [["Round 22", "Hawthorn", 14, 0], ["Round 23", "Gold Coast SUNS", 10, 0], ["Round 24", "Collingwood", 7, 0], ["Qualifying & Elimination Finals", "Sydney Swans", 11, 0], ["Semi Finals", "Adelaide Crows", 12, 0], ["Preliminary Finals", "Hawthorn", 11, 0]], "vs": [["Round 12", 10, 0]]}, "cameron": {"m": 2.3, "k": 8, "season": 2.23, "sd": 1.09, "l5": 2.4, "n": 26, "last": [["Round 22", "Hawthorn", 15, 3], ["Round 23", "Gold Coast SUNS", 17, 2], ["Round 24", "Collingwood", 11, 2], ["Qualifying & Elimination Finals", "Sydney Swans", 4, 0], ["Semi Finals", "Adelaide Crows", 14, 5], ["Preliminary Finals", "Hawthorn", 13, 3]], "vs": [["Round 12", 10, 2]]}, "hipwood": {"m": 1.8, "k": 8, "season": 1.54, "sd": 0.93, "l5": 2.2, "n": 13, "last": [["Round 22", "Hawthorn", 9, 2], ["Round 23", "Gold Coast SUNS", 10, 1], ["Round 24", "Collingwood", 15, 3], ["Qualifying & Elimination Finals", "Sydney Swans", 11, 2], ["Semi Finals", "Adelaide Crows", 12, 2], ["Preliminary Finals", "Hawthorn", 11, 3]], "vs": []}, "brayshaw": {"m": 25.5, "k": 7.9, "season": 25.0, "sd": 5.36, "l5": 26.2, "n": 26, "last": [["Round 22", "Melbourne", 20, 0], ["Round 23", "Adelaide Crows", 27, 1], ["Round 24", "Carlton", 21, 1], ["Qualifying & Elimination Finals", "Hawthorn", 30, 1], ["Semi Finals", "Geelong Cats", 24, 0], ["Preliminary Finals", "Sydney Swans", 29, 0]], "vs": [["Round 12", 24, 0]]}, "bolton": {"m": 22.5, "k": 4.0, "season": 22.68, "sd": 5.31, "l5": 22.2, "n": 25, "last": [["Round 22", "Melbourne", 17, 1], ["Round 23", "Adelaide Crows", 27, 1], ["Round 24", "Carlton", 17, 1], ["Qualifying & Elimination Finals", "Hawthorn", 21, 0], ["Semi Finals", "Geelong Cats", 26, 2], ["Preliminary Finals", "Sydney Swans", 20, 2]], "vs": [["Round 12", 21, 0]]}, "clark": {"m": 23.9, "k": 8, "season": 22.73, "sd": 4.27, "l5": 25.6, "n": 26, "last": [["Round 22", "Melbourne", 21, 0], ["Round 23", "Adelaide Crows", 25, 0], ["Round 24", "Carlton", 21, 0], ["Qualifying & Elimination Finals", "Hawthorn", 38, 0], ["Semi Finals", "Geelong Cats", 25, 0], ["Preliminary Finals", "Sydney Swans", 19, 0]], "vs": [["Round 12", 24, 0]]}, "voss": {"m": 1.66, "k": 3.5, "season": 1.84, "sd": 1.46, "l5": 1.4, "n": 25, "last": [["Round 22", "Melbourne", 10, 4], ["Round 23", "Adelaide Crows", 7, 0], ["Round 24", "Carlton", 6, 2], ["Qualifying & Elimination Finals", "Hawthorn", 11, 0], ["Semi Finals", "Geelong Cats", 12, 4], ["Preliminary Finals", "Sydney Swans", 10, 1]], "vs": [["Round 12", 13, 4]]}};
 const P = Object.fromEntries(PLAYERS.map(p => [p.id, p]));
 const L = (p, op, n, txt) => ({p, op, n, txt});
 const WIN = {win:true, txt:'Brisbane Lions to win'};
@@ -282,13 +289,13 @@ BETS.forEach(b => b.legs.forEach(l => { const k = legKey(l); l.key = k; if (!UNI
 const TOTAL_STAKE = BETS.reduce((s, b) => s + b.stake, 0);
 
 // ---------- State ----------
-const STORE = 'gf26-tracker-v1';
+const STORE = 'gf26-tracker-v2';
 function freshState() {
   return {
     q:1, base:0, running:false, startedAt:0, final:false,
     score:{bri:{g:0,b:0}, fre:{g:0,b:0}},
     pl:Object.fromEntries(PLAYERS.map(p => [p.id, {x:0, out:false}])),
-    set:{p0:50, sigma:38, qlen:31, kD:3, kG:3, corr:1, autoScore:true, means:Object.fromEntries(PLAYERS.map(p => [p.id, p.m]))},
+    set:{p0:57, sigma:38, qlen:32, trust:1, corr:1, autoScore:true, live:true, means:Object.fromEntries(PLAYERS.map(p => [p.id, p.m]))},
     hist:[],
   };
 }
@@ -324,7 +331,7 @@ function ctx(snap) {
   const sigma = st.sigma, mu0 = sigma*PhiInv(Math.min(0.99, Math.max(0.01, st.p0/100)));
   const pp = {};
   PLAYERS.forEach(p => {
-    const m = +st.means[p.id] || 0.01, k = p.stat === 'disp' ? st.kD : st.kG, x = snap.pl[p.id].x, out = snap.pl[p.id].out;
+    const m = +st.means[p.id] || 0.01, k = RESEARCH[p.id].k*(+st.trust || 1), x = snap.pl[p.id].x, out = snap.pl[p.id].out;
     pp[p.id] = {x, out, a: m*k + x, b: k + f, r: (out || f >= 1) ? 0 : r, c: (p.stat === 'disp' ? 0.08 : 0.25)*st.corr, sgn: p.team === 'BRI' ? 1 : -1};
   });
   return {f, r, sigma, mu0, margin:snap.margin, pp, final: f >= 1};
@@ -526,10 +533,15 @@ function render() {
 }
 
 // Tracker (built once, updated in place)
+function formLine(p) {
+  const r = RESEARCH[p.id], gi = p.stat === 'disp' ? 2 : 3, u = p.stat === 'disp' ? '' : 'g';
+  const vs = r.vs.length ? ` · v ${p.team === 'BRI' ? 'Freo' : 'Lions'} R12: ${r.vs[0][gi - 1]}${u}` : '';
+  return `2026: ${r.season} avg (${r.n} games) · last 5: ${r.l5} · recent ${r.last.map(x => x[gi] + u).join(', ')}${vs}`;
+}
 function buildTracker() {
   const grp = t => PLAYERS.filter(p => p.team === t).map(p => `
     <div class="prow" id="row-${p.id}">
-      <div><div class="pn">${esc(p.name)}</div><div class="pmeta">${p.stat === 'disp' ? 'Disposals' : 'Goals'} · avg ${'<span id="avg-' + p.id + '"></span>'} · <button class="toggle" data-out="${p.id}" id="out-${p.id}">Mark off ground</button></div></div>
+      <div><div class="pn">${esc(p.name)}</div><div class="pmeta">${p.stat === 'disp' ? 'Disposals' : 'Goals'} · expect <span id="avg-${p.id}"></span> · <span id="tog-${p.id}"></span><button class="toggle" data-out="${p.id}" id="out-${p.id}">Mark off ground</button></div><div class="pmeta form-g">${formLine(p)}</div></div>
       <div class="pctl"><button class="pm" data-d="${p.id},-1" aria-label="Minus one ${esc(p.name)}">−</button><input class="cnt num" id="cnt-${p.id}" inputmode="numeric" aria-label="${esc(p.name)} ${p.stat}"><button class="pm plus ${p.stat === 'goals' ? 'gl' : ''}" data-d="${p.id},1" aria-label="Plus one ${esc(p.name)}">+</button></div>
       <div class="needs" id="needs-${p.id}"></div>
     </div>`).join('');
@@ -543,6 +555,8 @@ function renderTracker() {
     $('row-' + p.id).classList.toggle('out', s.out);
     $('out-' + p.id).textContent = s.out ? 'Back on' : 'Mark off ground';
     $('avg-' + p.id).textContent = S.set.means[p.id];
+    const tg = liveDoc && liveDoc.players && liveDoc.players[p.id] ? liveDoc.players[p.id].tog : null;
+    $('tog-' + p.id).textContent = tg ? `${Math.round(tg)}% TOG · ` : '';
     const legs = [];
     BETS.forEach(b => b.legs.forEach(l => { if (l.p === p.id) legs.push({b, l}); }));
     $('needs-' + p.id).innerHTML = legs.map(({b, l}) => {
@@ -551,6 +565,7 @@ function renderTracker() {
     }).join('');
   });
   $('autoScore').checked = !!S.set.autoScore;
+  $('liveOn').checked = !!S.set.live;
 }
 
 // Chart
@@ -581,14 +596,13 @@ function buildForm() {
   const st = S.set;
   let h = `
     <label for="f-p0">Lions pre-game win chance (%)</label><input id="f-p0" type="number" min="1" max="99" step="1" value="${st.p0}">
-    <div class="hint">Set from the head-to-head market: 100 ÷ Lions price, adjusted for the margin.</div>
+    <div class="hint">Default 57% is Squiggle's betting-market model (Lions by 7.4). The 28-model Squiggle aggregate has 51.5%.</div>
     <label for="f-qlen">Real minutes per quarter</label><input id="f-qlen" type="number" min="20" max="40" step="0.5" value="${st.qlen}">
     <label for="f-sigma">Final margin spread (points, 1 sd)</label><input id="f-sigma" type="number" min="15" max="60" step="1" value="${st.sigma}">
-    <label for="f-kD">Trust in pre-game averages: disposals</label><input id="f-kD" type="number" min="0.2" max="20" step="0.1" value="${st.kD}">
-    <label for="f-kG">Trust in pre-game averages: goals</label><input id="f-kG" type="number" min="0.2" max="20" step="0.1" value="${st.kG}">
-    <div class="hint">Measured in games. Lower numbers let in-game pace count for more.</div>
+    <label for="f-trust">Trust in pre-game averages (×)</label><input id="f-trust" type="number" min="0.2" max="5" step="0.1" value="${st.trust}">
+    <div class="hint">1 = each player's own consistency from 2026 data. Lower lets in-game pace count for more.</div>
     <label for="f-corr">Same-game correlation</label><select id="f-corr"><option value="0">Off (independent)</option><option value="1">Normal</option><option value="2">Strong</option></select>`;
-  PLAYERS.forEach(p => { h += `<label for="m-${p.id}">${esc(p.name)} avg ${p.stat === 'disp' ? 'disposals' : 'goals'}</label><input id="m-${p.id}" type="number" min="0.1" step="${p.stat === 'disp' ? 0.5 : 0.1}" value="${st.means[p.id]}">`; });
+  PLAYERS.forEach(p => { h += `<label for="m-${p.id}">${esc(p.name)} expected ${p.stat === 'disp' ? 'disposals' : 'goals'}</label><input id="m-${p.id}" type="number" min="0.1" step="${p.stat === 'disp' ? 0.5 : 0.1}" value="${st.means[p.id]}">`; });
   $('form').innerHTML = h;
   $('f-corr').value = String(st.corr);
   $('form').addEventListener('change', e => {
@@ -613,6 +627,7 @@ document.addEventListener('change', e => {
   const t = e.target;
   if (t.id && t.id.startsWith('cnt-')) { const v = parseInt(t.value, 10); if (isFinite(v) && v >= 0) { snapshot(); S.pl[t.id.slice(4)].x = v; } changed(); }
   if (t.id === 'autoScore') { S.set.autoScore = t.checked; save(); }
+  if (t.id === 'liveOn') { S.set.live = t.checked; save(); if (t.checked && liveDoc) applyLive(liveDoc); feedStatus(); }
 });
 $('clkBtn').onclick = () => { if (S.final) return; snapshot(); if (S.running) { S.base = qMinutes(); S.running = false; } else { S.running = true; S.startedAt = now(); } changed(true); requestWake(); };
 $('minUp').onclick = () => { snapshot(); S.base += 1; changed(); };
@@ -637,6 +652,41 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 // ticking clock
 let lastSim = 0;
 setInterval(() => { if (!S.running) return; renderBoard(); if (now() - lastSim > 15000) { lastSim = now(); compute(); } }, 1000);
+
+// ---------- Live feed (relayed from the official AFL stats API into this page's database) ----------
+let liveDoc = null, dbOk = null;
+function applyLive(d) {
+  if (!d || !S.set.live) return;
+  const started = d.status !== 'CONFIRMED_TEAMS' && d.status !== 'SCHEDULED' && d.status !== 'UNCONFIRMED_TEAMS';
+  S.score.bri = {g: d.bri.g, b: d.bri.b}; S.score.fre = {g: d.fre.g, b: d.fre.b};
+  PLAYERS.forEach(p => { const x = d.players && d.players[p.id]; if (x) S.pl[p.id].x = p.stat === 'disp' ? x.d : x.g; });
+  if (d.status === 'CONCLUDED' || d.status === 'POST_GAME') { S.final = true; S.running = false; }
+  else if (started) {
+    S.final = false; S.q = Math.min(4, Math.max(1, d.period));
+    if (d.periodCompleted) { S.running = false; S.base = S.set.qlen; }
+    else { S.running = true; S.base = d.periodSeconds/60; S.startedAt = Date.parse(d.updatedAt) || now(); }
+  }
+  changed(true);
+}
+function feedStatus() {
+  const dot = $('feedDot'), txt = $('feedTxt');
+  if (dbOk === false) { dot.className = 'dot'; txt.textContent = 'Live feed unavailable here. Tap stats in manually.'; return; }
+  if (!liveDoc) { dot.className = 'dot'; txt.textContent = 'Live feed: waiting for first update'; return; }
+  const age = Math.round((now() - Date.parse(liveDoc.updatedAt))/1000);
+  const ago = age < 90 ? age + 's ago' : Math.round(age/60) + ' min ago';
+  const quiet = liveDoc.status === 'CONFIRMED_TEAMS' || liveDoc.status === 'CONCLUDED' || liveDoc.periodCompleted;
+  dot.className = 'dot ' + (age < 240 || quiet ? 'on' : 'stale');
+  txt.textContent = `AFL live stats · updated ${ago}` + (S.set.live ? '' : ' · paused, using your taps');
+}
+setInterval(feedStatus, 5000);
+(async () => {
+  try {
+    const db = window.claude && window.claude.use ? await window.claude.use('db') : null;
+    if (!db) { dbOk = false; feedStatus(); return; }
+    dbOk = true;
+    db.doc('live/gf').onSnapshot(s => { if (!s.exists) { feedStatus(); return; } const d = s.data(); if (liveDoc && liveDoc.updatedAt === d.updatedAt) return; liveDoc = d; applyLive(d); feedStatus(); }, () => { dbOk = false; feedStatus(); });
+  } catch (e) { dbOk = false; feedStatus(); }
+})();
 
 // ---------- Boot ----------
 buildTracker(); buildForm();
